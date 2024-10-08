@@ -7,7 +7,7 @@ geometry: margin=2.54cm
 fig_height: 3
 fig_width: 4
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## OVERVIEW
@@ -28,7 +28,7 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
 
 1. Set up your session. Load the tidyverse, lubridate, here & cowplot packages, and verify your home directory. Read in the NTL-LTER processed data files for nutrients and chemistry/physics for Peter and Paul Lakes (use the tidy `NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv` version in the Processed_KEY folder) and the processed data file for the Niwot Ridge litter dataset (use the `NEON_NIWO_Litter_mass_trap_Processed.csv` version, again from the Processed_KEY folder). 
 
-```{r}
+```{r, message = FALSE}
 # Load necessary packages
 library(tidyverse)
 library(lubridate)
@@ -63,10 +63,6 @@ head(niwo_litter_data)
 # Check the structure of the data to see the format of the date columns
 str(peter_paul_data$sampledate)
 str(niwo_litter_data$collectDate)
-
-# Function to convert date strings to Date format (MM-DD-YYY)
-#peter_paul_data$sampledate <- as.Date(peter_paul_data$collectDate, format = "%m/%d/%Y")
-#niwo_litter_data$collectDate <- as.Date(niwo_litter_data$collectDate, format = "%m/%d/%Y")
 
 ```
 ## Define your theme
@@ -112,20 +108,20 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 # Example plot to demonstrate the theme
 
-example_plot <- peter_paul_data %>% 
-       ggplot(aes(x = po4, 
+example_plot <- ggplot(peter_paul_data, aes(x = po4, 
            y = tp_ug, 
            color = lakename)) +
-  geom_smooth(method = "lm", se = FALSE) +  # Add a line of best fit using the linear model (lm) method
+  geom_point()+
+  geom_smooth(method = "lm") +  # Add a line of best fit using the linear model (lm) method
   labs(
     title = "Total Phosphorus vs. Phosphate in Peter and Paul Lakes",
-    x = "Phosphate (ug/L)",
+    x = "Total Phosphate (ug/L)",
     y = "Total Phosphorus (ug/L)",
     color = "Lake Name"
   ) +
   # Adjust axes to hide extreme values (use xlim() and ylim() based on data distribution)
   xlim(0, 50) +  # Set the limits for the x-axis based on reasonable phosphate values
-  ylim(0, 100)   # Set the limits for the y-axis based on reasonable total phosphorus values
+  ylim(0, 150)   # Set the limits for the y-axis based on reasonable total phosphorus values
 
 example_plot
 ```
@@ -151,10 +147,14 @@ plot_temp <- ggplot(peter_paul_data, aes(x = month, y = temperature_C, color = l
   geom_boxplot() +
   labs(title = "Temperature by Month", y = "Temperature (°C)", x = "Month") +
   theme(
-    legend.position = "none",  # Remove legend for this plot
+    legend.position = "top",  # Remove legend for this plot
+    legend.background = element_blank(),  # Remove legend background
+    legend.text = element_text(size = 8),  # Smaller legend text size
+    legend.title = element_text(size = 8),  # Smaller legend title size
     axis.title.x = element_blank(),  # Remove x-axis title for alignment
-    axis.title.y = element_blank()  # Remove x-axis title for alignment
+    axis.title.y = element_text(angle = 90, size = 8, hjust = 0.5)
   )+
+  scale_color_discrete(name = "Lake Name") +  # Set legend title to "Lake Name"
   ylim(0,30)
 
 # (b) Boxplot for Total Phosphorus (TP) by Month and Lake
@@ -164,7 +164,7 @@ plot_tp <- ggplot(peter_paul_data, aes(x = month, y = tp_ug, color = lakename)) 
   theme(
     legend.position = "none",  # Remove legend for this plot
     axis.title.x = element_blank(),  # Remove x-axis title for alignment
-    axis.title.y = element_blank()  # Remove x-axis title for alignment
+    axis.title.y = element_text(angle = 90, size = 8, hjust = 0.5) 
   )+
   ylim(0,160)
 
@@ -175,13 +175,9 @@ plot_tn <- ggplot(peter_paul_data, aes(x = month, y = tn_ug, color = lakename)) 
   theme(
     legend.position = "none",  # Remove legend for this plot
     axis.title.x = element_blank(),  # Remove x-axis title for alignment
-    axis.title.y = element_blank()  # Remove x-axis title for alignment
+    axis.title.y = element_text(angle = 90, size = 8, hjust = 0.5) 
   )+
   ylim(0,3500)
-
-plot_temp
-plot_tp
-plot_tn
 
 ```
 
@@ -192,8 +188,8 @@ combined_plot <- plot_grid(
   plot_temp, 
   plot_tp, 
   plot_tn, 
-  ncol = 3,                     # Arrange plots in 1 row with 3 columns
-  align = "hv"                  # Align plots horizontally and vertically
+  nrow = 3,                     # Arrange plots in 3 rows
+  align = "h"                  # Align plots horizontally 
 )
 
 # Add a shared legend from one of the plots (e.g., from plot_temp)
@@ -207,7 +203,7 @@ legend <- get_legend(ggplot(peter_paul_data, aes(x = month, color = lakename)) +
                         )+ labs(color = "Lake Name"))
 
 # Combine the plots and the legend into the final layout
-final_plot <- plot_grid(combined_plot, legend, ncol = 1, rel_heights = c(0.5, 0.1)) # Adjust legend size if needed
+final_plot <- plot_grid(combined_plot, align='h', rel_heights = c(1.3, 1,1)) # Adjust legend size if needed
 
 # Display the final combined plot
 print(final_plot)
@@ -215,8 +211,7 @@ print(final_plot)
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
-> Answer: Temperature: Peaks in summer (July/August) with higher variability. Paul Lake generally shows slightly higher temperatures than Peter Lake. Total Phosphorus & Nitrogen: Consistent medians, more variability in warmer months. Paul Lake tends to have higher Total Phosphorus levels, while Peter Lake shows higher Total Nitrogen levels during certain months.
-Lakes Comparison: Similar seasonal trends, but Paul Lake has higher temperatures and Total Phosphorus, whereas Peter Lake has higher Total Nitrogen in some months.
+> Answer: Temperature: Peaks in summer (July/August) with higher variability. Paul Lake generally shows slightly higher temperatures than Peter Lake. Total Phosphorus & Nitrogen: Consistent medians, more variability in warmer months. Paul Lake tends to have higher Total Phosphorus levels, while Peter Lake shows higher Total Nitrogen levels during certain months. Lakes Comparison: Similar seasonal trends, but Paul Lake has higher temperatures and Total Phosphorus, whereas Peter Lake has higher Total Nitrogen in some months.
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -232,8 +227,6 @@ ggplot(needles_data, aes(x = collectDate, y = dryMass, color = nlcdClass)) +
        x = "Date",
        y = "Dry Mass (g)",
        color = "NLCD Class") 
-
-#By date or daynum?
 
 ```
 
