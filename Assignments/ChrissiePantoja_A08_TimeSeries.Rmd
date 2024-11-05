@@ -136,16 +136,16 @@ cat("Dimensions of GaringerOzone: ", dim(GaringerOzone)[1], " rows and ", dim(Ga
 
 # Create a line plot of ozone concentrations over time
 ggplot(data = GaringerOzone, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
-  geom_line(color = "blue", size = 1) +  # Line for actual concentrations
-  geom_point(color = "blue", alpha = 0.5) +  # Points for actual concentrations
-  geom_smooth(method = "lm", color = "red", se = FALSE) +  # Smoothed line showing trend
+  geom_line(color = "blue", size = 1) +  
+  geom_point(color = "blue", alpha = 0.5) +  
+  geom_smooth(method = "lm", color = "red", se = FALSE) +  
   labs(title = "Daily Max 8-Hour Ozone Concentration Over Time",
        x = "Date",
        y = "Ozone Concentration (ppm)",
        caption = "Data Source: Garinger Ozone Dataset") +
   theme_minimal() +  # Minimal theme for better aesthetics
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +  # Format x-axis
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 ```
 
@@ -181,8 +181,8 @@ summary(GaringerOzone.clean)
 # Step 1: Add columns for year and month, then calculate monthly mean ozone concentrations
 GaringerOzone.monthly <- GaringerOzone.clean %>%
   mutate(
-    year = year(Date),          # Extract year from Date column
-    month = month(Date)          # Extract month from Date column
+    year = year(Date),          
+    month = month(Date)         
   ) %>%
   group_by(year, month) %>%
   summarize(
@@ -281,12 +281,12 @@ ggplot(GaringerOzone.monthly, aes(x = Date, y = mean_ozone)) +
   labs(
     title = "Mean Monthly Ozone Concentrations Over Time",
     x = "Date",
-    y = "Mean Monthly Ozone Concentration (ppb)" # adjust the unit as appropriate
+    y = "Mean Monthly Ozone Concentration (ppm)"
   ) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") + # One tick per year
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   theme_minimal() +
   theme(
-    plot.title = element_text(hjust = 0.5) # Center the title
+    plot.title = element_text(hjust = 0.5)
   )
 ```
 
