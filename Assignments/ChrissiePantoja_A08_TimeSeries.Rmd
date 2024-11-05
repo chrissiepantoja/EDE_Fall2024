@@ -276,11 +276,11 @@ summary(ozone_trend_test)
 # Make sure `Date` is a Date object representing the first day of each month
 
 ggplot(GaringerOzone.monthly, aes(x = Date, y = mean_ozone)) +
-  geom_line(color = "blue") +         # Line layer
-  geom_point(color = "red") +         # Point layer
+  geom_line(color = "blue") +         
+  geom_point(color = "red") +       
   labs(
     title = "Mean Monthly Ozone Concentrations Over Time",
-    x = "Date",
+    x = "Time",
     y = "Mean Monthly Ozone Concentration (ppm)"
   ) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
