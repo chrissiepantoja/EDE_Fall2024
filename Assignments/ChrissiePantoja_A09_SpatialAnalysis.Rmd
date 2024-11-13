@@ -1,6 +1,6 @@
 ---
 title: "Assignment 9: Spatial Analysis in R"
-author: "Student Name"
+author: "Chrissie Pantoja"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -25,7 +25,7 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 
 1.    Import libraries: tidyverse, sf, leaflet, here, and mapview
 
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 
 # Import the familiar libraries
 library(tidyverse); library(lubridate); library(here)
@@ -45,7 +45,7 @@ sf::sf_use_s2(FALSE)
 
 2.    Execute the `here()` command to display the current project directory
 
-```{r Prepare workspace, error=F, warning=F}
+```{r Prepare workspace, error = FALSE, echo=TRUE, warning=FALSE}
 here()
 ```
 
@@ -55,20 +55,18 @@ In this exercise, we will be exploring stream gage height data in Nebraska corre
 
 3.    Read the `cb_2018_us_county_20m.shp` shapefile into an sf dataframe, filtering records for Nebraska counties (State FIPS = 31)
 
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 # Read the shapefile
 counties <- st_read("Data/Spatial/cb_2018_us_county_20m.shp")
 
 # Filter for Nebraska counties (State FIPS code = 31)
 nebraska_counties <- counties[counties$STATEFP == "31", ]
 
-# Display the result
-print(nebraska_counties)
 ```
 
 4.    Reveal the dataset's coordinate reference system
 
-```{r}
+```{r , echo=TRUE, warning=FALSE}
 # Reveal the dataset's CRS
 st_crs(nebraska_counties)
 ```
@@ -95,7 +93,7 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 7.    Read the `NWIS_SiteInfo_NE_RAW.csv` file into a standard dataframe, being sure to set the `site_no` field as well as other character columns as a factor. 
 
-```{r}
+```{r , echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 
 # Load necessary library
 library(readr)
@@ -110,7 +108,7 @@ nwis_data <- read_csv("Data/Raw/NWIS_SiteInfo_NE_RAW.csv") %>%
 
 8.    Display the structure of this dataset.
 
-```{r Read in USGS Gage Locations}
+```{r Read in USGS Gage Locations, echo=TRUE, warning=FALSE}
 # Display the structure of the dataset
 str(nwis_data)
 ```
@@ -163,13 +161,13 @@ ggplot() +
   # Plot the counties dataset (using the sf dataframe)
   geom_sf(data = nebraska_counties, fill = "lightblue", color = "black") + 
   # Plot the gage locations with larger size and adjusted transparency
-  geom_sf(data = nwis_sf, color = "red", size = 1, alpha = 0.8) + 
+  geom_sf(data = nwis_sf, color = "red", size = 1.5, alpha = 0.8) + 
   # Add title and subtitle
   ggtitle("NWIS Gage Locations in Nebraska", subtitle = "Chrissie Pantoja") + 
   # Customize the theme
   theme_minimal() + 
   # Adjust the map limits to focus the map on Nebraska
-  coord_sf(xlim = c(-105, -90), ylim = c(40, 43), expand = FALSE)  # Make sure the map zoom is appropriate
+  coord_sf()  # Make sure the map zoom is appropriate
 
 ```
 
@@ -181,7 +179,7 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 14. Read the `NWIS_SiteFlowData_NE_RAW.csv` dataset in as a dataframe
     *   Pay attention to which fields should be imported as factors!
     
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 
 # Read in the NWIS Site Flow Data CSV file
 nwis_raw <- read.csv("Data/Raw/NWIS_SiteFlowData_NE_RAW.csv", 
@@ -239,20 +237,20 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 19.   Plot the gage sites on top of counties (using `mapview`, `ggplot`, or `leaflet`) 
     *   Show the magnitude of gage height by color, shape, other visualization technique.
 
-```{r map gage sites}
+```{r map gage sites, echo=TRUE, warning=FALSE}
 # Plot counties and gage locations with further adjustments
 ggplot() + 
   # Plot the counties dataset (using the sf dataframe)
   geom_sf(data = nebraska_counties, fill = "white", color = "black") + 
   # Plot the gage locations with larger size and adjusted transparency
   geom_sf(data = sdf_gages_joined, color = "blue", aes(size = gage_ht), alpha = 0.3) + 
-  labs(size = "Gage Height")
   # Add title and subtitle
   ggtitle("NWIS Gage Locations in Nebraska") + 
+  labs(size = "Gage Height")+
   # Customize the theme
   theme_minimal() + 
   # Adjust the map limits to focus the map on Nebraska
-  coord_sf(xlim = c(-105, -90), ylim = c(40, 43), expand = FALSE)  # Make sure the map zoom is appropriate
+  coord_sf()  # Make sure the map zoom is appropriate
 ```
 
 ---
@@ -266,7 +264,7 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 
 20. Transform the counties and gage sf datasets to UTM Zone 14N (EPGS = 32614).
 
-```{r spatial analysis}
+```{r spatial analysis, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 # Transform counties to UTM Zone 14N (EPSG: 32614)
 counties_sf_utm <- st_transform(nebraska_counties, crs = 32614)
 
@@ -277,7 +275,7 @@ gage_data_utm <- st_transform(gage_data_with_sites, crs = 32614)
 
 21. Using `mapview` or `ggplot`, plot the data so that each can be seen as different colors
 
-```{r spatial analysis}
+```{r spatial analysis2}
 
 # Create interactive map with different colors for each layer
 mapview(counties_sf_utm, col.regions = "blue") +
@@ -290,7 +288,7 @@ mapview(counties_sf_utm, col.regions = "blue") +
 Now let's zoom into a particular county and examine the gages located there. 
 22. Select Lancaster county from your projected county sf dataframe 
 
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 
 # Filter the county sf dataframe for Lancaster County
 lancaster_county <- counties_sf_utm %>% 
@@ -300,14 +298,14 @@ lancaster_county <- counties_sf_utm %>%
 
 23. Select the gage sites falling within that county to a new spatial dataframe
 
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 # Use st_intersection to find gage sites within Lancaster County
 lancaster_gages <- st_intersection(gage_data_utm, lancaster_county)
 
 ```
 
 24. Select the gage sites within 15km of the county to a new spatial dataframe
-```{r}
+```{r, echo=TRUE, warning=FALSE, results='hide', message = FALSE}
 
 # Create a 15 km buffer around Lancaster County
 lancaster_buffer <- st_buffer(lancaster_county, dist = 15000)
@@ -331,7 +329,7 @@ ggplot() +
   geom_sf(data = counties_sf_utm, fill = "lightgray", color = "black") +
   
   # Highlight Lancaster County in a distinct color, such as blue
-  geom_sf(data = lancaster_county, fill = "blue", color = "black", alpha = 0.5) +
+  geom_sf(data = lancaster_county, fill = "white", color = "black", alpha = 0.5) +
   
   # Plot gage sites within Lancaster County with a different symbol, such as filled circles
   geom_sf(data = lancaster_gages, color = "red", shape = 16, size = 2, 
