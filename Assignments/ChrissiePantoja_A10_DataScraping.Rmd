@@ -232,6 +232,7 @@ df_asheville_all <- bind_rows(map2(rep(pwsid, length(years)), years, scrape.it))
 
 # Plot Asheville's max daily withdrawals with a smoothed line
 ggplot(df_asheville_all, aes(x = date, y = water_supply_sources)) +
+  geom_line(color = "green", size = 1) +
   geom_smooth(method = "loess", color = "blue", fill = "lightblue", size = 1.2, se = FALSE) +
   labs(
     title = "Water Usage data for Ashevile (2018-2022)",
